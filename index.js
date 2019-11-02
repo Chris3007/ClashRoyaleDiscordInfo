@@ -73,18 +73,7 @@ bot.on('message', function(message) {
         })
     }else if(message.guild.id == restrictedGuild || message.channel.id == restrictedChannel) {
 
-    switch(args[0].toLowerCase()) {
-
-        /**###########################################
-         *                  TODO                     #
-         * 1. andere kist cycles (klaar)             #
-         * 2. profiel: w/l donat (klaar)             #
-         * 3. Voeg clan vorige wars toe  [beta]      #
-         * 4. fix alles                              # 
-         *                                           #
-         *############################################ 
-        */
-        
+    switch(args[0].toLowerCase()) {        
 
         case "help":
             message.channel.send(`prefix: ${prefix}\nRegistreer: gebruik je playertag om je te registreren\n\`${prefix}registreer [playertag]\`\n\n Kisten: bekijk je kist cycle of die van iemand anders\n\`${prefix}kisten [playertag]\`\n\nProfiel: bekijk statistieken van jezelf of iemand anders\n\`${prefix}profiel [playertag]\`\n\n Clan: bekijk info over de clan\n\`\`\`${prefix}clan war\n${prefix}clan top\`\`\`\n**[BETA]**  Clan war vorige: bekijk de resultaten van de vorige clan wars  \n\`${prefix}clan war vorige [nummer (0-5)]\`\n\n**Als je al geregistreerd bent hoef je niet telekens je playertag achter je command te zetten**`) 
@@ -93,7 +82,6 @@ bot.on('message', function(message) {
 
         case "registreer":
             if(args[1]) {
-                //check of de tag begint met een #
                 if (args[1].charAt(0) == "#") {
                     args[1] = args[1].substr(1)
                 }
@@ -383,7 +371,7 @@ bot.on('message', function(message) {
                         //Request de data, zet de top 10 in een ebmed (2 per field voor verschillende kleuren)
                 case "top":
                     var xmlHttp = new XMLHttpRequest();
-                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/members`, false ); // false for synchronous request
+                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/members`, false ); // false for synchronous request
                     xmlHttp.setRequestHeader("Content-type", "application/json");
                     xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                     xmlHttp.send(); 
@@ -412,7 +400,7 @@ bot.on('message', function(message) {
                         }
 
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/warlog`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
@@ -453,7 +441,7 @@ bot.on('message', function(message) {
                     }else {
                         //Request de data, kijk naar de status en voer per status iets uit
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/currentwar`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
