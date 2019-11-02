@@ -1,2 +1,3 @@
-/node_modules/tokens.js
-/node_modules/login.js
+/node_modules/*
+!/node_modules/tokens (preview).js
+!/node_modules/login (preview).js

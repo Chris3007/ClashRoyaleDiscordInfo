@@ -64,7 +64,7 @@ bot.on("ready" ,function() {
         await delay(300000) //900000ms = 15 min 
 
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/currentwar`, false ); // false for synchronous request
+        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/currentwar`, false ); // false for synchronous request
         xmlHttp.setRequestHeader("Content-type", "application/json");
         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
         xmlHttp.send(); 
@@ -131,7 +131,7 @@ bot.on("ready" ,function() {
 
                 //Get the data from the last war (the one that just ended). This is necessary because the previous result only contains '{status:'notInWar'}'.
                 var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/warlog`, false ); // false for synchronous request
+                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/warlog`, false ); // false for synchronous request
                 xmlHttp.setRequestHeader("Content-type", "application/json");
                 xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                 xmlHttp.send(); 

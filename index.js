@@ -12,9 +12,9 @@ const apiToken =tokens.apiToken;
 const discordToken = tokens.discordToken;
 const clanTag = tokens.clantoken;
 const prefix = tokens.prefix;
-const restrictedChannelClan = tokens.restrictedChannelClan;
 const restrictedChannel = tokens.restrictedChannel;
 const restrictedGuild = tokens.restrictedGuild;
+
 
 async function delay(ms) {
     // return await for better async stack trace support in case of errors.
@@ -55,7 +55,6 @@ bot.on("ready" ,function() {
 
 bot.on('message', function(message) {
 
-    console.log(message.guild.id)
     if (message.author.equals(bot.user)) return;   
     if (!message.content.startsWith(prefix)) return;
 
@@ -371,7 +370,7 @@ bot.on('message', function(message) {
                         //Request de data, zet de top 10 in een ebmed (2 per field voor verschillende kleuren)
                 case "top":
                     var xmlHttp = new XMLHttpRequest();
-                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/members`, false ); // false for synchronous request
+                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/members`, false ); // false for synchronous request
                     xmlHttp.setRequestHeader("Content-type", "application/json");
                     xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                     xmlHttp.send(); 
@@ -400,7 +399,7 @@ bot.on('message', function(message) {
                         }
 
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/warlog`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/warlog`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
@@ -441,14 +440,12 @@ bot.on('message', function(message) {
                     }else {
                         //Request de data, kijk naar de status en voer per status iets uit
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/${clanTag}/currentwar`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/currentwar`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
                         var result = JSON.parse(xmlHttp.responseText)
                         msg.edit("<:clan:589769271958175760> Clanwar deelnemers")
-                        console.log(result.state)
-
 
                         if(result.state == "collectionDay"){
                             //Als het colletion day is, maakt dit een embed met voor iedere participant 1 field. 
