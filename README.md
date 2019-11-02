@@ -1,1 +1,1 @@
-"# ClashRoyaleInfo" 
+# ClashRoyaleInfo
