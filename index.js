@@ -4,11 +4,10 @@ const bot = new Discord.Client();
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const mysql = require('mysql');
-
 const login = require("login"); 
 
 const tokens = require('tokens');
-const apiToken =tokens.apiToken;
+const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
 const clanTag = tokens.clantoken;
 const prefix = tokens.prefix;
@@ -19,7 +18,7 @@ const restrictedGuild = tokens.restrictedGuild;
 async function delay(ms) {
     // return await for better async stack trace support in case of errors.
     return await new Promise(resolve => setTimeout(resolve, ms));
-  }
+}
 
 
 
@@ -75,7 +74,7 @@ bot.on('message', function(message) {
     switch(args[0].toLowerCase()) {        
 
         case "help":
-            message.channel.send(`prefix: ${prefix}\nRegistreer: gebruik je playertag om je te registreren\n\`${prefix}registreer [playertag]\`\n\n Kisten: bekijk je kist cycle of die van iemand anders\n\`${prefix}kisten [playertag]\`\n\nProfiel: bekijk statistieken van jezelf of iemand anders\n\`${prefix}profiel [playertag]\`\n\n Clan: bekijk info over de clan\n\`\`\`${prefix}clan war\n${prefix}clan top\`\`\`\n**[BETA]**  Clan war vorige: bekijk de resultaten van de vorige clan wars  \n\`${prefix}clan war vorige [nummer (0-5)]\`\n\n**Als je al geregistreerd bent hoef je niet telekens je playertag achter je command te zetten**`) 
+            message.channel.send(`prefix: ${prefix}\nRegistreer: gebruik je playertag om je te registreren\n\`${prefix}registreer [playertag]\`\n\n Kisten: bekijk je kist cycle of die van iemand anders\n\`${prefix}kisten [playertag]\`\n\nProfiel: bekijk statistieken van jezelf of iemand anders\n\`${prefix}profiel [playertag]\`\n\n Clan: bekijk info over de clan\n\`\`\`${prefix}clan war\n${prefix}clan top\`\`\`\n**[BETA]**  Clan war vorige: bekijk de resultaten van de vorige clan wars  \n\`${prefix}clan war vorige [nummer (0-5)]\`\n\n**Als je al geregistreerd bent hoef je niet telkens je playertag achter je command te zetten**`) 
         break; 
 
 
@@ -105,13 +104,13 @@ bot.on('message', function(message) {
                             if (err) {msg.edit(`Sorry, er ging iets mis!`);}
                         });
 
-                        connection.query(`SELECT * FROM beta where userid = "${messageId}"`, (err,rows) => {
+                        connection.query(`SELECT * FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
                             if(err) throw err;
 
                             if(rows.length >= 1) {
                                 msg.edit(`Je bent al geregistreed`);
                             }else {
-                                connection.query(`INSERT INTO beta(userid, tag, name) VALUES ("${messageId}","${args[1]}", "${result.name}")`, (err, rows) => {
+                                connection.query(`INSERT INTO dcMembers(userid, tag, name) VALUES ("${messageId}","${args[1]}", "${result.name}")`, (err, rows) => {
                                     if (err) throw err;
                                     msg.edit("Je bent geregistreerd")
                                 })
@@ -144,7 +143,7 @@ bot.on('message', function(message) {
                         if (err) {msg.edit(`Sorry, er ging iets mis!`);}
                     });
 
-                    connection.query(`SELECT tag FROM beta where userid = "${messageId}"`, (err,rows) => {
+                    connection.query(`SELECT tag FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
                         if(err) throw err;
 
                         if(rows.length == 0) {
@@ -234,7 +233,7 @@ bot.on('message', function(message) {
                             if (err) {msg.edit(`Sorry, er ging iets mis!`);}
                         });
             
-                        connection.query(`SELECT tag FROM beta where userid = "${messageId}"`, (err,rows) => {
+                        connection.query(`SELECT tag FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
                             if(err) throw err;
             
                             if(rows.length == 0) {
@@ -370,7 +369,7 @@ bot.on('message', function(message) {
                         //Request de data, zet de top 10 in een ebmed (2 per field voor verschillende kleuren)
                 case "top":
                     var xmlHttp = new XMLHttpRequest();
-                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/members`, false ); // false for synchronous request
+                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/members`, false ); // false for synchronous request
                     xmlHttp.setRequestHeader("Content-type", "application/json");
                     xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                     xmlHttp.send(); 
@@ -399,7 +398,7 @@ bot.on('message', function(message) {
                         }
 
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/warlog`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
@@ -440,7 +439,7 @@ bot.on('message', function(message) {
                     }else {
                         //Request de data, kijk naar de status en voer per status iets uit
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/currentwar`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
@@ -449,7 +448,7 @@ bot.on('message', function(message) {
 
                         if(result.state == "collectionDay"){
                             //Als het colletion day is, maakt dit een embed met voor iedere participant 1 field. 
-                            const warEmbed = new Discord.RichEmbed()
+                            var warEmbed = new Discord.RichEmbed()
                             .setTitle("<:clan:589769271958175760> Clanwar deelnemers")
                             .setColor("#0000FF")
                             var warMessage = "";
@@ -467,7 +466,7 @@ bot.on('message', function(message) {
 
                         }else if(result.state == "warDay") {
                             //maak embed met data
-                            const warEmbed = new Discord.RichEmbed()
+                            var warEmbed = new Discord.RichEmbed()
                             .setTitle("<:clan:589769271958175760> Clanwar deelnemers")
                             .setColor("#0000FF");
                             var warMessage = "";
