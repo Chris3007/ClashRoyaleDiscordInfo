@@ -162,7 +162,7 @@ bot.on("ready" ,function() {
                 }
 
                 var warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\n"+standing+"\nDit was iedereen die meedeed:")`
+                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\n"+standing+"\nDit was iedereen die meedeed:")
                 .setColor("#0000FF");
                 var warMessage = "";
                 
