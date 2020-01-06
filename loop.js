@@ -97,7 +97,7 @@ bot.on("ready" ,function() {
 
                 console.log("[" + new Date().toLocaleString() + "] The warday just started")
                 var warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> Collection day is voorbij en Battle day gaat nu beginnen!\nDit is iedereen die meedoet:")
+                .setTitle("<:clan:589769271958175760> Collection day is over and Battle day is going to begin!\nThis is everyone who participates:")
                 .setColor("#0000FF")
                 var warMessage = "";
                 var part = result.participants;  
@@ -126,13 +126,13 @@ bot.on("ready" ,function() {
 
 
                 //Clan war just started
-                bot.channels.get(restrictedChannelClan).send("Er is weer een nieuwe clanwar begonnen!")
+                bot.channels.get(restrictedChannelClan).send("A new clan war just started!")
                 console.log("[" + new Date().toLocaleString() + "] Clan war just started")
 
             }else if(result.state == "notInWar" && data[0].status == "collectionDay") {
                 //Clan war cancelled
-                bot.channels.get(restrictedChannelClan).send("De clan war is geanuleerd")
-                console.log("[" + new Date().toLocaleString() + "] Clan war just stopped")
+                bot.channels.get(restrictedChannelClan).send("The clan war just got cancelled")
+                console.log("[" + new Date().toLocaleString() + "] Clan war just cancelled ")
             }else if(result.state == "notInWar" && data[0].status == "warDay"){
 
 
@@ -147,24 +147,22 @@ bot.on("ready" ,function() {
                 var result = result.items[0]
 
                 //This is for when clanwar ended
-                console.log("[" + new Date().toLocaleString() + "] De clan war is nu afgelopen")
+                console.log("[" + new Date().toLocaleString() + "] The clan war is finished")
                 var standing = "";
                 if(result.standings[0].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we eerste geworden!**";
+                    standing = "**This clanwar we finished first!**";
                 }else if(result.standings[1].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we tweede geworden!**";
+                    standing = "**This clanwar we finished second!**";
                 }else if(result.standings[2].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we derde geworden**";
+                    standing = "**This clanwar we finished third**";
                 }else if(result.standings[3].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we vierde geworden**";
+                    standing = "**This clanwar we finished fourth**";
                 }else if(result.standings[4].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we vijfde geworden**";
+                    standing = "**This clanwar we finished fifth**";
                 }
 
                 var warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\n"+standing+"\nDit was iedereen die meedeed:")
-                var warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\nDit was iedereen die meedeed:")
+                .setTitle("<:clan:589769271958175760> The clan war is over!\n"+standing+"\nThis was everyone who participated:")
                 .setColor("#0000FF");
                 var warMessage = "";
                 
