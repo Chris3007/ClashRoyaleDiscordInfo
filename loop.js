@@ -63,14 +63,16 @@ bot.on("ready" ,function() {
         
         await delay(300000)
 
+        //For some reason it appears that including the clanTag in xmlHttp.open() does noet give the expected result. This way it will return the data you want. 
+        var reqUrl = `https://api.clashroyale.com/v1/clans/%23`+clanTag+`/currentwar`;
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
+        xmlHttp.open( "GET", reqUrl, false ); // false for synchronous request
         xmlHttp.setRequestHeader("Content-type", "application/json");
         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
         xmlHttp.send(); 
         await xmlHttp.responseText;
         var result =  JSON.parse(xmlHttp.responseText)
-
+        console.log(result)
 
         pool.getConnection((err, conn) => {
             if (err) throw err;
@@ -107,16 +109,13 @@ bot.on("ready" ,function() {
 
 
                 part.forEach(participant => {
-                        //warMessage = warMessage + (`**${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} battles, waarvan ${result.participants[count].wins} gewonnen\n`)
-                        
-                        if(result.participants[count].collectionDayBattlesPlayed < 3) {
-                            warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, **${result.participants[count].collectionDayBattlesPlayed} collection battles**\n`)
-                        }else {
-                            warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
-                        }
-                        
-                        count++
-
+                    if(result.participants[count].collectionDayBattlesPlayed < 3) {
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cars, **${result.participants[count].collectionDayBattlesPlayed} collection battles**\n`)
+                    }else {
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
+                    }
+                    
+                    count++
                 });
                 
                 warEmbed.setDescription(warMessage, inline=true)
@@ -137,13 +136,15 @@ bot.on("ready" ,function() {
 
 
                 //Get the data from the last war (the one that just ended). This is necessary because the previous result only contains '{status:'notInWar'}'.
+                var reqUrl = `https://api.clashroyale.com/v1/clans/%23`+clanTag+`/warlog`;
                 var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
+                xmlHttp.open( "GET", reqUrl, false ); // false for synchronous request
                 xmlHttp.setRequestHeader("Content-type", "application/json");
                 xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                 xmlHttp.send(); 
+                await xmlHttp.responseText;
                 var result =  JSON.parse(xmlHttp.responseText)
-
+                console.log(result)
                 var result = result.items[0]
 
                 //This is for when clanwar ended
@@ -171,12 +172,12 @@ bot.on("ready" ,function() {
                 part.forEach(participant => {
                     //als wins = 0, helaas verloren, anders hoera
                     if (result.participants[count].battlesPlayed == 0) {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, **laatste battle niet gespeeld!**\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, **did not play last battle!**\n`)
                     }
                     else if (result.participants[count].wins == 0) {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle verloren\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, lost last battle\n`)
                     }else {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle gewonnen\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, won last battle\n`)
                     }
                     count++
                 });
@@ -197,8 +198,12 @@ bot.on("ready" ,function() {
         run()
     }
 
+
+
     run();
 
+
+    
 })
 
 
