@@ -8,7 +8,7 @@ const mysql = require('mysql');
 const login = require("login"); 
 
 const tokens = require('tokens');
-const apiToken =tokens.apiToken;
+const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
 const clanTag = tokens.clantoken
 const restrictedChannelClan = tokens.restrictedChannelClan
@@ -27,7 +27,7 @@ var pool  = mysql.createPool({
 async function delay(ms) {
     // return await for better async stack trace support in case of errors.
     return await new Promise(resolve => setTimeout(resolve, ms));
-  }
+  } 
 
 
 var SQLresult = 0;
@@ -60,16 +60,15 @@ bot.on("ready" ,function() {
 
 
     let run = async ()=>{
-        
-        await delay(500) //900000ms = 15 min 
+
+        await delay(300000)
 
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/currentwar`, false ); // false for synchronous request
+        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
         xmlHttp.setRequestHeader("Content-type", "application/json");
         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
         xmlHttp.send(); 
         await xmlHttp.responseText;
-        console.log(xmlHttp.responseText)
         var result =  JSON.parse(xmlHttp.responseText)
 
 
@@ -83,25 +82,30 @@ bot.on("ready" ,function() {
             
             conn.release();
         });
+        
 
         await delay(5000)
 
 
         if(data[0].status == result.state) {
-            console.log("[" + new Date().toLocaleString() + "] No problem");
+            console.log("[" + new Date().toLocaleString() + "] Checked");
         }else {
             
             
             if(result.state == "warDay" && data[0].status == "collectionDay") {
                 
 
-                console.log("De warday just started")
-                const warEmbed = new Discord.RichEmbed()
+                console.log("[" + new Date().toLocaleString() + "] The warday just started")
+                var warEmbed = new Discord.RichEmbed()
                 .setTitle("<:clan:589769271958175760> Collection day is voorbij en Battle day gaat nu beginnen!\nDit is iedereen die meedoet:")
                 .setColor("#0000FF")
                 var warMessage = "";
                 var part = result.participants;  
-                var count = 0;              
+                var count = 0;     
+                
+                
+
+
                 part.forEach(participant => {
                         //warMessage = warMessage + (`**${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} battles, waarvan ${result.participants[count].wins} gewonnen\n`)
                         
@@ -123,15 +127,18 @@ bot.on("ready" ,function() {
 
                 //Clan war just started
                 bot.channels.get(restrictedChannelClan).send("Er is weer een nieuwe clanwar begonnen!")
-                console.log("De clan war is begonnen")
+                console.log("[" + new Date().toLocaleString() + "] Clan war just started")
 
-
+            }else if(result.state == "notInWar" && data[0].status == "collectionDay") {
+                //Clan war cancelled
+                bot.channels.get(restrictedChannelClan).send("De clan war is geanuleerd")
+                console.log("[" + new Date().toLocaleString() + "] Clan war just stopped")
             }else if(result.state == "notInWar" && data[0].status == "warDay"){
 
 
                 //Get the data from the last war (the one that just ended). This is necessary because the previous result only contains '{status:'notInWar'}'.
                 var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/warlog`, false ); // false for synchronous request
+                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
                 xmlHttp.setRequestHeader("Content-type", "application/json");
                 xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                 xmlHttp.send(); 
@@ -140,9 +147,22 @@ bot.on("ready" ,function() {
                 var result = result.items[0]
 
                 //This is for when clanwar ended
-                console.log("De clan war is nu afgelopen")
-                const warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\nDit was iedereen die meedeed:")
+                console.log("[" + new Date().toLocaleString() + "] De clan war is nu afgelopen")
+                var standing = "";
+                if(result.standings[0].clan.tag == "#PURV2URR") {
+                    standing = "**Deze clanwar zijn we eerste geworden!**";
+                }else if(result.standings[1].clan.tag == "#PURV2URR") {
+                    standing = "**Deze clanwar zijn we tweede geworden!**";
+                }else if(result.standings[2].clan.tag == "#PURV2URR") {
+                    standing = "**Deze clanwar zijn we derde geworden**";
+                }else if(result.standings[3].clan.tag == "#PURV2URR") {
+                    standing = "**Deze clanwar zijn we vierde geworden**";
+                }else if(result.standings[4].clan.tag == "#PURV2URR") {
+                    standing = "**Deze clanwar zijn we vijfde geworden**";
+                }
+
+                var warEmbed = new Discord.RichEmbed()
+                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\n"+standing+"\nDit was iedereen die meedeed:")
                 .setColor("#0000FF");
                 var warMessage = "";
                 
