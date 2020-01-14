@@ -63,13 +63,16 @@ bot.on("ready" ,function() {
 
         await delay(300000)
 
+        //For some reason it appears that including the clanTag in xmlHttp.open() does noet give the expected result. This way it will return the data you want. 
+        var reqUrl = `https://api.clashroyale.com/v1/clans/%23`+clanTag+`/currentwar`;
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
+        xmlHttp.open( "GET", reqUrl, false ); // false for synchronous request
         xmlHttp.setRequestHeader("Content-type", "application/json");
         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
         xmlHttp.send(); 
         await xmlHttp.responseText;
         var result =  JSON.parse(xmlHttp.responseText)
+        console.log(result)
 
 
         pool.getConnection((err, conn) => {
@@ -137,13 +140,15 @@ bot.on("ready" ,function() {
 
 
                 //Get the data from the last war (the one that just ended). This is necessary because the previous result only contains '{status:'notInWar'}'.
+                var reqUrl = `https://api.clashroyale.com/v1/clans/%23`+clanTag+`/warlog`;
                 var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
+                xmlHttp.open( "GET", reqUrl, false ); // false for synchronous request
                 xmlHttp.setRequestHeader("Content-type", "application/json");
                 xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                 xmlHttp.send(); 
+                await xmlHttp.responseText;
                 var result =  JSON.parse(xmlHttp.responseText)
-
+                console.log(result)
                 var result = result.items[0]
 
                 //This is for when clanwar ended
