@@ -61,7 +61,7 @@ bot.on("ready" ,function() {
 
     let run = async ()=>{
         
-        await delay(300000) //900000ms = 15 min 
+        await delay(500) //900000ms = 15 min 
 
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23${clanTag}/currentwar`, false ); // false for synchronous request
