@@ -22,15 +22,19 @@ var pool  = mysql.createPool({
     database: login.database
 });
 
+//Global vars. There is probaly a better way to do this, so please let me know
+var data = 0;
+var SQLresult = 0;
 
+//Re-used functions
 
+//This function is like a sleep function
 async function delay(ms) {
-    // return await for better async stack trace support in case of errors.
     return await new Promise(resolve => setTimeout(resolve, ms));
   } 
 
 
-var SQLresult = 0;
+//This function updates the 'clanwar' table in the MmySQL DataBase
 async function update(result) {
     
     pool.getConnection((err, conn) => {
@@ -49,10 +53,9 @@ async function update(result) {
 
 }
 
-//global
-var data = 0;
-
+//This function will connect the bot with discord and execute all the code inside
 bot.on("ready" ,function() {
+
     console.log("[" + new Date().toLocaleString() + "]");
     console.log(`Bot is active in ${bot.guilds.size} guilds, which have ${bot.users.size} users and ${bot.channels.size} channels.`); 
     console.log("The additional script is ready\n\n");
@@ -61,6 +64,7 @@ bot.on("ready" ,function() {
 
     let run = async ()=>{
         
+        //This causes this function to stop for 300000 milliseconds, which is 5 minutes
         await delay(300000)
 
         //For some reason it appears that including the clanTag in xmlHttp.open() does noet give the expected result. This way it will return the data you want. 
@@ -85,7 +89,6 @@ bot.on("ready" ,function() {
             conn.release();
         });
         
-
         await delay(5000)
 
 
@@ -95,24 +98,21 @@ bot.on("ready" ,function() {
             
             
             if(result.state == "warDay" && data[0].status == "collectionDay") {
-                
 
                 console.log("[" + new Date().toLocaleString() + "] The warday just started")
                 var warEmbed = new Discord.RichEmbed()
                 .setTitle("<:clan:589769271958175760> Collection day is over and Battle day is going to begin!\nThis is everyone who participates:")
                 .setColor("#0000FF")
                 var warMessage = "";
-                var part = result.participants;  
-                var count = 0;     
-                
-                
+                var part = result.participants;
+                var count = 0;
 
 
                 part.forEach(participant => {
                     if(result.participants[count].collectionDayBattlesPlayed < 3) {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cars, **${result.participants[count].collectionDayBattlesPlayed} collection battles**\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, **${result.participants[count].collectionDayBattlesPlayed} collection battles**\n`)
                     }else {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
                     }
                     
                     count++
