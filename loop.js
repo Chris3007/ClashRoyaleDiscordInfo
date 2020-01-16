@@ -10,7 +10,7 @@ const login = require("login");
 const tokens = require('tokens');
 const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
-const clanTag = tokens.clantoken
+const clanTag = tokens.clanToken
 const restrictedChannelClan = tokens.restrictedChannelClan
 
 
