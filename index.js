@@ -493,34 +493,6 @@ bot.on('message', function(message) {
                     }
                 break;
         
-                
-                case "arrow":
-                    //predictedArrow stuff
-                    switch(args[2].toLowerCase()) {
-                        case "top":
-                                var xmlHttp = new XMLHttpRequest();
-                                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PYYCVYJ0`, false ); // false for synchronous request
-                                xmlHttp.setRequestHeader("Content-type", "application/json");
-                                xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                                xmlHttp.send(); 
-                                var result = JSON.parse(xmlHttp.responseText)
-                    
-                                var embed = new Discord.RichEmbed()
-                                .setTitle("<:clan:589769271958175760> Top spelers van PredictedArrows")
-                                .addField("1. " + result.memberList[0].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[0].trophies, "2. " + result.memberList[1].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[1].trophies)
-                                .addField("3. " + result.memberList[2].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[2].trophies, "4. " + result.memberList[3].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[3].trophies)
-                                .addField("5. " + result.memberList[4].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[4].trophies, "6. " + result.memberList[3].name +" <:trophy_working:590862428544303114> -")
-                                .addField("7. " + result.memberList[6].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[6].trophies, "8. " + result.memberList[7].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[7].trophies)
-                                //.addField("9. " + result.memberList[8].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[8].trophies, "10. " + result.memberList[9].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[9].trophies)
-                                .setColor("#00FF00")
-                    
-                                msg.edit(embed)
-                        break;
-                        default:
-                    }
-        
-        
-                break; 
                 default:
                     message.edit("Dit is geen geldig commando!")
                     msg.delete(2500)
