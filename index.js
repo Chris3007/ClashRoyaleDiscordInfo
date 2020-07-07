@@ -34,7 +34,7 @@ bot.on("ready" ,function() {
     async function activity() {
         
         if(actSwitch == 0)    {
-            bot.user.setActivity(`${prefix}help voor commands`, { type: 'PLAYING' });
+            bot.user.setActivity(`${prefix}help for available commands`, { type: 'PLAYING' });
     
             actSwitch = 1;
             }else {
@@ -63,7 +63,7 @@ bot.on('message', function(message) {
 
     const messageId = message.author.id;
     if(message.channel.id !== restrictedChannel && message.guild.id !== restrictedGuild ) {
-        message.channel.send("Je kunt deze commands alleen uitvoeren in <#587903874334195753>.").then(msg=> {
+        message.channel.send("You can only use these command in <#"+restrictedChannel+">.").then(msg=> {
             setTimeout(function(){ 
                 msg.delete(); 
             }, 5000);
@@ -327,210 +327,188 @@ bot.on('message', function(message) {
 
         break;
 
-
-        case "seizoen":
-            //command seizoen
-            var countDownDate = new Date("Nov 4, 2019 9:00:00").getTime();
-
-
-            // Get today's date and time
-            var now = new Date().getTime();
-                
-            // Find the distance between now and the count down date
-            var distance = countDownDate - now;
-                
-            // Time calculations for days, hours, minutes and seconds
-            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                
-            // Output the result in an element with id="demo"
-            message.channel.send("Nog " + days + " dagen, " + hours + ":"
-            + minutes + ":" + seconds + " tot het nieuwe seizoen.");
-                
-            // If the count down is over, write some text 
-            if (distance < 0) {
-                clearInterval(x);
-                message.channel.send("Het nieuwe seizoen is begonnen!");
-            }
-        break;
-
+    /*\
+    |*|     This command is currently disabled. It would have been a countdown to the next season, but I had to manually update it. N
+    |*|    case "seizoen":
+    |*|        //command seizoen
+    |*|        var countDownDate = new Date("Nov 4, 2019 9:00:00").getTime();
+    |*|
+    |*|
+    |*|        // Get today's date and time
+    |*|           var now = new Date().getTime();
+    |*|            
+    |*|        // Find the distance between now and the count down date
+    |*|        var distance = countDownDate - now;
+    |*|            
+    |*|        // Time calculations for days, hours, minutes and seconds
+    |*|        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    |*|        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    |*|        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    |*|        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    |*|            
+    |*|        // Output the result in an element with id="demo"
+    |*|        message.channel.send("Nog " + days + " dagen, " + hours + ":"
+    |*|        + minutes + ":" + seconds + " tot het nieuwe seizoen.");
+    |*|            
+    |*|        // If the count down is over, write some text 
+    |*|        if (distance < 0) {
+    |*|            clearInterval(x);
+    |*|            message.channel.send("Het nieuwe seizoen is begonnen!");
+    |*|        }
+    |*|    break;
+    \*/
 
         case "clan":
-            //command clan
-        message.channel.send("<:clan:589769271958175760> De data wordt opgehaald...").then(msg=> {
-        if (!args[1]) {
-            msg.delete()
-        }else {
-            switch(args[1].toLowerCase()) {
-        
-
-                        //Request de data, zet de top 10 in een ebmed (2 per field voor verschillende kleuren)
-                case "top":
-                    var xmlHttp = new XMLHttpRequest();
-                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/members`, false ); // false for synchronous request
-                    xmlHttp.setRequestHeader("Content-type", "application/json");
-                    xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                    xmlHttp.send(); 
-                    var result = JSON.parse(xmlHttp.responseText)
-                    var clanEmbed = new Discord.RichEmbed()
-                    .setTitle(`<:clan:589769271958175760> Top spelers van PredictedLog`)
-                    .addField("1. " + result.items[0].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[0].trophies, "2. " + result.items[1].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[1].trophies)
-                    .addField("3. " + result.items[2].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[2].trophies, "4. " + result.items[3].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[3].trophies)
-                    .addField("5. " + result.items[4].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[4].trophies, "6. " + result.items[5].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[5].trophies)
-                    .addField("7. " + result.items[6].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[6].trophies, "8. " + result.items[7].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[7].trophies)
-                    .addField("9. " + result.items[8].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[8].trophies, "10. " + result.items[9].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[9].trophies)
-                    .setColor("#00FF00")
-                    msg.edit(clanEmbed)
-                break;
-        
-
-                       
-                case "war":
-                    //Check of dat de user vorige wars wilt zien of niet.
-                    if(args[2] == "vorige" || args[2] == "v") {
-
-                        //Als er geen 3e argument is, dan is die 0. Dit zorgt ervoor dat er alsnog een war gekozen wordt
-                        if (!args[3]) {
-                            message
-                            args[3] = 0
-                        }
-
+                
+            message.channel.send("<:clan:589769271958175760> The data is being processed...").then(msg=> {
+            
+            if (!args[1]) {
+                msg.delete()
+            }else {
+                switch(args[1].toLowerCase()) {
+            
+                    //Request the data, put the top 10 in an embed with different colours for each row. This is done by using the title and content field of each addField 
+            
+                    case "top":
                         var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
-                        xmlHttp.setRequestHeader("Content-type", "application/json");
-                        xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                        xmlHttp.send(); 
-                        var result = JSON.parse(xmlHttp.responseText);
-                        var standings = result.items[args[3]].standings;
-
-                        var warlog = new Discord.RichEmbed();
-
-                        var count = 1;
-                        standings.forEach(standing => {
-                                //check of dat de eerste character van de tropheen een '-' is of niet
-                                var trophyChange = standing.trophyChange.toString();
-                                if (standing.trophyChange.toString().charAt(0) == "-") {
-                                    warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trofeeën verloren")
-                                }else {
-                                    warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trofeeën gewonnen")
-                                }
-                                count++
-                        });
-
-                        //Formateer de datum
-
-                        //Het format van de datum die binnenkomt is yyyymmddThhmmss.000Z (ISO 8601)
-                        //Dit wordt opgesplitst bij de T, zodat yyyymmdd en hhmmss overblijven. Daarna wordt dat ook opgesplitst
-
-                        var str = result.items[args[3]].createdDate;
-                        var all = str.split("T");
-  
-                        splitDate = all[0].match(/.{1,2}/g);
-                                                
-                        var year = splitDate[0]+splitDate[1];
-                        var month = splitDate[2];
-                        var day = splitDate[3];
-                    
-                        warlog.setColor("#f0f00f");
-                        warlog.setTitle("De resultaten van " + day + "-" + month + "-" + year )
-                        msg.edit(warlog)
-                    }else {
-                        //Request de data, kijk naar de status en voer per status iets uit
-                        var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
+                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/members`, false ); // false for synchronous request
                         xmlHttp.setRequestHeader("Content-type", "application/json");
                         xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
                         xmlHttp.send(); 
                         var result = JSON.parse(xmlHttp.responseText)
-                        msg.edit("<:clan:589769271958175760> Clanwar deelnemers")
+                        var clanEmbed = new Discord.RichEmbed()
+                        .setTitle(`<:clan:589769271958175760> Top players from [clan]`)
+                        .addField("1. " + result.items[0].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[0].trophies, "2. " + result.items[1].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[1].trophies)
+                        .addField("3. " + result.items[2].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[2].trophies, "4. " + result.items[3].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[3].trophies)
+                        .addField("5. " + result.items[4].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[4].trophies, "6. " + result.items[5].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[5].trophies)
+                        .addField("7. " + result.items[6].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[6].trophies, "8. " + result.items[7].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[7].trophies)
+                        .addField("9. " + result.items[8].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[8].trophies, "10. " + result.items[9].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[9].trophies)
+                        .setColor("#00FF00")
+                        msg.edit(clanEmbed)
 
-                        if(result.state == "collectionDay"){
-                            //Als het colletion day is, maakt dit een embed met voor iedere participant 1 field. 
-                            var warEmbed = new Discord.RichEmbed()
-                            .setTitle("<:clan:589769271958175760> Clanwar deelnemers")
-                            .setColor("#0000FF")
-                            var warMessage = "";
-                            var part = result.participants;  
-                            var count = 0;              
-                            part.forEach(participant => {
-                                    //Count+1 is voor de ranglijst. Dit zorgt ervoor dat nr 1 ook echt nr 1 is en niet 0
-                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
-                                count++
-                
+                    break;
+            
+
+                        
+                    case "war":
+                        //Check if user wants to see previous wars.
+                        if(args[2] == "previous" || args[2] == "p") {
+
+                            //If the third argument has not been specified, it'll be 3. This ensures there will be a war chosen
+                            if (!args[3]) {
+                                message
+                                args[3] = 0
+                            }
+
+                            var xmlHttp = new XMLHttpRequest();
+                            xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
+                            xmlHttp.setRequestHeader("Content-type", "application/json");
+                            xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                            xmlHttp.send(); 
+                            var result = JSON.parse(xmlHttp.responseText);
+                            var standings = result.items[args[3]].standings;
+
+                            var warlog = new Discord.RichEmbed();
+
+                            var count = 1;
+                            standings.forEach(standing => {
+                                    //check of dat de eerste character van de tropheen een '-' is of niet
+                                    var trophyChange = standing.trophyChange.toString();
+                                    if (standing.trophyChange.toString().charAt(0) == "-") {
+                                        warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trophies lost")
+                                    }else {
+                                        warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trophies won")
+                                    }
+                                    count++
                             });
-                            warEmbed.setDescription(warMessage, inline=true)
-                            msg.edit(warEmbed)
+
+                            /*\     Format the date
+                            |*|
+                            |*| The format used is the ISO 8601 standard (yyyymmddThhmmss.000Z)
+                            |*| This is split up at the T, resulting 2 parts:
+                            |*|     all[0] contains yyyymmdd   
+                            |*|     all[1] contains hhmmss.000Z. Because the exact minute that the clan war was started is not very usefull, this will be left alone
+                            |*| 
+                            |*| all[0] will be spilt up in the correct format after which it will be used in the title of the embed                           
+                            \*/
+
+                            var str = result.items[args[3]].createdDate;
+                            var all = str.split("T");
+    
+                            splitDate = all[0].match(/.{1,2}/g);
+                                                    
+                            var year = splitDate[0]+splitDate[1];
+                            var month = splitDate[2];
+                            var day = splitDate[3];
+                        
+                            warlog.setColor("#f0f00f");
+                            warlog.setTitle("The results of " + day + "-" + month + "-" + year )
+                            msg.edit(warlog)
+                        }else {
+
+                            //If the user doesnt want a previous war, this will check what the current state of the war is. Depending on the state, it will display different things
+                            var xmlHttp = new XMLHttpRequest();
+                            xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
+                            xmlHttp.setRequestHeader("Content-type", "application/json");
+                            xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                            xmlHttp.send(); 
+                            var result = JSON.parse(xmlHttp.responseText)
+                            msg.edit("<:clan:589769271958175760> Clanwar participants")
+
+                            if(result.state == "collectionDay"){
+                                var warEmbed = new Discord.RichEmbed()
+                                .setTitle("<:clan:589769271958175760> Clanwar participants")
+                                .setColor("#0000FF")
+                                var warMessage = "";
+                                var part = result.participants;  
+                                var count = 0;              
+                                part.forEach(participant => {
+                                        //Count+1 is for the list. This is to ensure that #1 is actually #1 and not #0, because arrays start at 0
+                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
+                                    count++
+                    
+                                });
+                                warEmbed.setDescription(warMessage, inline=true)
+                                msg.edit(warEmbed)
 
 
-                        }else if(result.state == "warDay") {
-                            //maak embed met data
-                            var warEmbed = new Discord.RichEmbed()
-                            .setTitle("<:clan:589769271958175760> Clanwar deelnemers")
-                            .setColor("#0000FF");
-                            var warMessage = "";
-                            var part = result.participants;  
-                            var count = 0;              
-                            part.forEach(participant => {
-                                //als wins = 0, hellaas verloren, anders hoera
-                                if (result.participants[count].battlesPlayed == 0) {
-                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle niet gespeeld\n`)
-                                }
-                                else if (result.participants[count].wins == 0) {
-                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle verloren\n`)
-                                }else {
-                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle gewonnen\n`)
-                                }
-                                count++
-                            });
-                            warEmbed.setDescription(warMessage, inline=true);
-                            msg.edit(warEmbed);
-                        }else{
-                            //Spreek voor zich hé :p
-                            msg.edit("De clan is nu niet in een oorlog.")
+                            }else if(result.state == "warDay") {
+                                var warEmbed = new Discord.RichEmbed()
+                                .setTitle("<:clan:589769271958175760> Clanwar participants")
+                                .setColor("#0000FF");
+                                var warMessage = "";
+                                var part = result.participants;  
+                                var count = 0;              
+                                part.forEach(participant => {
+                                    //If wins == 0, lost. Else person won
+                                    if (result.participants[count].battlesPlayed == 0) {
+                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, did not play last battle\n`)
+                                    }
+                                    else if (result.participants[count].wins == 0) {
+                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, lost last battle\n`)
+                                    }else {
+                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, won last battle\n`)
+                                    }
+                                    count++
+                                });
+                                warEmbed.setDescription(warMessage, inline=true);
+                                msg.edit(warEmbed);
+                            }else{
+                                //Pretty self-explanatory
+                                msg.edit("This clan is currently not at war.")
+                            }
                         }
+                    break; 
+                    default:
+                        message.edit("This is not a valid command!")
+                        msg.delete(2500)
                     }
-                break;
-        
-                
-                case "arrow":
-                    //predictedArrow stuff
-                    switch(args[2].toLowerCase()) {
-                        case "top":
-                                var xmlHttp = new XMLHttpRequest();
-                                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PYYCVYJ0`, false ); // false for synchronous request
-                                xmlHttp.setRequestHeader("Content-type", "application/json");
-                                xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                                xmlHttp.send(); 
-                                var result = JSON.parse(xmlHttp.responseText)
-                    
-                                var embed = new Discord.RichEmbed()
-                                .setTitle("<:clan:589769271958175760> Top spelers van PredictedArrows")
-                                .addField("1. " + result.memberList[0].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[0].trophies, "2. " + result.memberList[1].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[1].trophies)
-                                .addField("3. " + result.memberList[2].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[2].trophies, "4. " + result.memberList[3].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[3].trophies)
-                                .addField("5. " + result.memberList[4].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[4].trophies, "6. " + result.memberList[3].name +" <:trophy_working:590862428544303114> -")
-                                .addField("7. " + result.memberList[6].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[6].trophies, "8. " + result.memberList[7].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[7].trophies)
-                                //.addField("9. " + result.memberList[8].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[8].trophies, "10. " + result.memberList[9].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.memberList[9].trophies)
-                                .setColor("#00FF00")
-                    
-                                msg.edit(embed)
-                        break;
-                        default:
-                    }
-        
-        
-                break; 
-                default:
-                    message.edit("Dit is geen geldig commando!")
-                    msg.delete(2500)
                 }
-            }
-        })
+            })
         break;
 
         default:
-            message.channel.send("Dit is geen geldig commando!")
+            message.channel.send("This is not a valid command!")
     }
 
 
