@@ -110,7 +110,12 @@ bot.on('message', function(message) {
                             if(rows.length >= 1) {
                                 msg.edit(`Je bent al geregistreed`);
                             }else {
-                                connection.query(`INSERT INTO dcMembers(userid, tag, name) VALUES ("${messageId}","${args[1]}", "${result.name}")`, (err, rows) => {
+
+                                if (result.clan.tag.charAt(0) == "#") {
+                                    result.clan.tag = result.clan.tag.substr(1)
+                                }
+
+                                connection.query(`INSERT INTO dcMembers(userid, tag, clanTag, name) VALUES ("${messageId}","${args[1]}", "${result.clan.tag}", "${result.name}")`, (err, rows) => {
                                     if (err) throw err;
                                     msg.edit("Je bent geregistreerd")
                                 })
@@ -361,149 +366,174 @@ bot.on('message', function(message) {
         case "clan":
                 
             message.channel.send("<:clan:589769271958175760> The data is being processed...").then(msg=> {
-            
-            if (!args[1]) {
-                msg.delete()
-            }else {
-                switch(args[1].toLowerCase()) {
-            
-                    //Request the data, put the top 10 in an embed with different colours for each row. This is done by using the title and content field of each addField 
-            
-                    case "top":
-                        var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/members`, false ); // false for synchronous request
-                        xmlHttp.setRequestHeader("Content-type", "application/json");
-                        xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                        xmlHttp.send(); 
-                        var result = JSON.parse(xmlHttp.responseText)
-                        var clanEmbed = new Discord.RichEmbed()
-                        .setTitle(`<:clan:589769271958175760> Top players from [clan]`)
-                        .addField("1. " + result.items[0].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[0].trophies, "2. " + result.items[1].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[1].trophies)
-                        .addField("3. " + result.items[2].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[2].trophies, "4. " + result.items[3].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[3].trophies)
-                        .addField("5. " + result.items[4].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[4].trophies, "6. " + result.items[5].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[5].trophies)
-                        .addField("7. " + result.items[6].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[6].trophies, "8. " + result.items[7].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[7].trophies)
-                        .addField("9. " + result.items[8].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[8].trophies, "10. " + result.items[9].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[9].trophies)
-                        .setColor("#00FF00")
-                        msg.edit(clanEmbed)
 
-                    break;
-            
-
+                const connection = mysql.createConnection({
+                    host: login.host,
+                    user: login.user,
+                    password: login.password,
+                    database: login.database
+                    });
+                connection.connect((err) => {
+                    if (err) {msg.edit(`Sorry, er ging iets mis!`);}
+                });
+                
+                connection.query(`SELECT tag, clanTag FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
+                    if(err) throw err;
+                
+                    if(rows.length == 0) {
+                        msg.edit(`You haven't registerd yet. You can do this with the "${prefix}register" command.`);
+                    }else if (rows.length == 1) {
+                
                         
-                    case "war":
-                        //Check if user wants to see previous wars.
-                        if(args[2] == "previous" || args[2] == "p") {
-
-                            //If the third argument has not been specified, it'll be 3. This ensures there will be a war chosen
-                            if (!args[3]) {
-                                message
-                                args[3] = 0
-                            }
-
-                            var xmlHttp = new XMLHttpRequest();
-                            xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/warlog`, false ); // false for synchronous request
-                            xmlHttp.setRequestHeader("Content-type", "application/json");
-                            xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                            xmlHttp.send(); 
-                            var result = JSON.parse(xmlHttp.responseText);
-                            var standings = result.items[args[3]].standings;
-
-                            var warlog = new Discord.RichEmbed();
-
-                            var count = 1;
-                            standings.forEach(standing => {
-                                    //check of dat de eerste character van de tropheen een '-' is of niet
-                                    var trophyChange = standing.trophyChange.toString();
-                                    if (standing.trophyChange.toString().charAt(0) == "-") {
-                                        warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trophies lost")
-                                    }else {
-                                        warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trophies won")
-                                    }
-                                    count++
-                            });
-
-                            /*\     Format the date
-                            |*|
-                            |*| The format used is the ISO 8601 standard (yyyymmddThhmmss.000Z)
-                            |*| This is split up at the T, resulting 2 parts:
-                            |*|     all[0] contains yyyymmdd   
-                            |*|     all[1] contains hhmmss.000Z. Because the exact minute that the clan war was started is not very usefull, this will be left alone
-                            |*| 
-                            |*| all[0] will be spilt up in the correct format after which it will be used in the title of the embed                           
-                            \*/
-
-                            var str = result.items[args[3]].createdDate;
-                            var all = str.split("T");
-    
-                            splitDate = all[0].match(/.{1,2}/g);
-                                                    
-                            var year = splitDate[0]+splitDate[1];
-                            var month = splitDate[2];
-                            var day = splitDate[3];
-                        
-                            warlog.setColor("#f0f00f");
-                            warlog.setTitle("The results of " + day + "-" + month + "-" + year )
-                            msg.edit(warlog)
+                                
+                                
+                        if (!args[1]) {
+                            msg.delete()
                         }else {
-
-                            //If the user doesnt want a previous war, this will check what the current state of the war is. Depending on the state, it will display different things
-                            var xmlHttp = new XMLHttpRequest();
-                            xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%23PURV2URR/currentwar`, false ); // false for synchronous request
-                            xmlHttp.setRequestHeader("Content-type", "application/json");
-                            xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                            xmlHttp.send(); 
-                            var result = JSON.parse(xmlHttp.responseText)
-                            msg.edit("<:clan:589769271958175760> Clanwar participants")
-
-                            if(result.state == "collectionDay"){
-                                var warEmbed = new Discord.RichEmbed()
-                                .setTitle("<:clan:589769271958175760> Clanwar participants")
-                                .setColor("#0000FF")
-                                var warMessage = "";
-                                var part = result.participants;  
-                                var count = 0;              
-                                part.forEach(participant => {
-                                        //Count+1 is for the list. This is to ensure that #1 is actually #1 and not #0, because arrays start at 0
-                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
-                                    count++
-                    
-                                });
-                                warEmbed.setDescription(warMessage, inline=true)
-                                msg.edit(warEmbed)
-
-
-                            }else if(result.state == "warDay") {
-                                var warEmbed = new Discord.RichEmbed()
-                                .setTitle("<:clan:589769271958175760> Clanwar participants")
-                                .setColor("#0000FF");
-                                var warMessage = "";
-                                var part = result.participants;  
-                                var count = 0;              
-                                part.forEach(participant => {
-                                    //If wins == 0, lost. Else person won
-                                    if (result.participants[count].battlesPlayed == 0) {
-                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, did not play last battle\n`)
-                                    }
-                                    else if (result.participants[count].wins == 0) {
-                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, lost last battle\n`)
+                            switch(args[1].toLowerCase()) {
+                        
+                                //Request the data, put the top 10 in an embed with different colours for each row. This is done by using the title and content field of each addField 
+                        
+                                case "top":
+                                    var xmlHttp = new XMLHttpRequest();
+                                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%32${rows[0].clanTag}/members`, false ); // false for synchronous request
+                                    xmlHttp.setRequestHeader("Content-type", "application/json");
+                                    xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                                    xmlHttp.send(); 
+                                    var result = JSON.parse(xmlHttp.responseText)
+                                    var clanEmbed = new Discord.RichEmbed()
+                                    .setTitle(`<:clan:589769271958175760> Top players`)
+                                    .addField("1. " + result.items[0].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[0].trophies, "2. " + result.items[1].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[1].trophies)
+                                    .addField("3. " + result.items[2].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[2].trophies, "4. " + result.items[3].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[3].trophies)
+                                    .addField("5. " + result.items[4].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[4].trophies, "6. " + result.items[5].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[5].trophies)
+                                    .addField("7. " + result.items[6].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[6].trophies, "8. " + result.items[7].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[7].trophies)
+                                    .addField("9. " + result.items[8].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[8].trophies, "10. " + result.items[9].name + "\xa0\xa0\xa0\xa0\xa0\xa0<:trophy_working:590862428544303114> " + result.items[9].trophies)
+                                    .setColor("#00FF00")
+                                    msg.edit(clanEmbed)
+                
+                                break;
+                        
+                
+                                    
+                                case "war":
+                                    //Check if user wants to see previous wars.
+                                    if(args[2] == "previous" || args[2] == "p") {
+                
+                                        //If the third argument has not been specified, it'll be 3. This ensures there will be a war chosen
+                                        if (!args[3]) {
+                                            message
+                                            args[3] = 0
+                                        }
+                
+                                        var xmlHttp = new XMLHttpRequest();
+                                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%32${rows[0].clanTag}/warlog`, false ); // false for synchronous request
+                                        xmlHttp.setRequestHeader("Content-type", "application/json");
+                                        xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                                        xmlHttp.send(); 
+                                        var result = JSON.parse(xmlHttp.responseText);
+                                        var standings = result.items[args[3]].standings;
+                
+                                        var warlog = new Discord.RichEmbed();
+                
+                                        var count = 1;
+                                        standings.forEach(standing => {
+                                                //check of dat de eerste character van de tropheen een '-' is of niet
+                                                var trophyChange = standing.trophyChange.toString();
+                                                if (standing.trophyChange.toString().charAt(0) == "-") {
+                                                    warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trophies lost")
+                                                }else {
+                                                    warlog.addField(`#${count} **${standing.clan.name}**`, standing.trophyChange + " trophies won")
+                                                }
+                                                count++
+                                        });
+                
+                                        /*\     Format the date
+                                        |*|
+                                        |*| The format used is the ISO 8601 standard (yyyymmddThhmmss.000Z)
+                                        |*| This is split up at the T, resulting 2 parts:
+                                        |*|     all[0] contains yyyymmdd   
+                                        |*|     all[1] contains hhmmss.000Z. Because the exact minute that the clan war was started is not very usefull, this will be left alone
+                                        |*| 
+                                        |*| all[0] will be spilt up in the correct format after which it will be used in the title of the embed                           
+                                        \*/
+                
+                                        var str = result.items[args[3]].createdDate;
+                                        var all = str.split("T");
+                
+                                        splitDate = all[0].match(/.{1,2}/g);
+                                                                
+                                        var year = splitDate[0]+splitDate[1];
+                                        var month = splitDate[2];
+                                        var day = splitDate[3];
+                                    
+                                        warlog.setColor("#f0f00f");
+                                        warlog.setTitle("The results of " + day + "-" + month + "-" + year )
+                                        msg.edit(warlog)
                                     }else {
-                                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, won last battle\n`)
+                
+                                        //If the user doesnt want a previous war, this will check what the current state of the war is. Depending on the state, it will display different things
+                                        var xmlHttp = new XMLHttpRequest();
+                                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/clans/%32${rows[0].clanTag}/currentwar`, false ); // false for synchronous request
+                                        xmlHttp.setRequestHeader("Content-type", "application/json");
+                                        xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                                        xmlHttp.send(); 
+                                        var result = JSON.parse(xmlHttp.responseText)
+                                        msg.edit("<:clan:589769271958175760> Clanwar participants")
+                
+                                        if(result.state == "collectionDay"){
+                                            var warEmbed = new Discord.RichEmbed()
+                                            .setTitle("<:clan:589769271958175760> Clanwar participants")
+                                            .setColor("#0000FF")
+                                            var warMessage = "";
+                                            var part = result.participants;  
+                                            var count = 0;              
+                                            part.forEach(participant => {
+                                                    //Count+1 is for the list. This is to ensure that #1 is actually #1 and not #0, because arrays start at 0
+                                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
+                                                count++
+                                
+                                            });
+                                            warEmbed.setDescription(warMessage, inline=true)
+                                            msg.edit(warEmbed)
+                
+                
+                                        }else if(result.state == "warDay") {
+                                            var warEmbed = new Discord.RichEmbed()
+                                            .setTitle("<:clan:589769271958175760> Clanwar participants")
+                                            .setColor("#0000FF");
+                                            var warMessage = "";
+                                            var part = result.participants;  
+                                            var count = 0;              
+                                            part.forEach(participant => {
+                                                //If wins == 0, lost. Else person won
+                                                if (result.participants[count].battlesPlayed == 0) {
+                                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, did not play last battle\n`)
+                                                }
+                                                else if (result.participants[count].wins == 0) {
+                                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, lost last battle\n`)
+                                                }else {
+                                                    warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, won last battle\n`)
+                                                }
+                                                count++
+                                            });
+                                            warEmbed.setDescription(warMessage, inline=true);
+                                            msg.edit(warEmbed);
+                                        }else{
+                                            //Pretty self-explanatory
+                                            msg.edit("This clan is currently not at war.")
+                                        }
                                     }
-                                    count++
-                                });
-                                warEmbed.setDescription(warMessage, inline=true);
-                                msg.edit(warEmbed);
-                            }else{
-                                //Pretty self-explanatory
-                                msg.edit("This clan is currently not at war.")
+                                break; 
+                                default:
+                                    message.edit("This is not a valid command!")
+                                    msg.delete(2500)
+                                }
                             }
-                        }
-                    break; 
-                    default:
-                        message.edit("This is not a valid command!")
-                        msg.delete(2500)
+                
+                    }else {
+                
                     }
-                }
+                });
             })
         break;
 

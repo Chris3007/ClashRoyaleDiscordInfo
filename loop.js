@@ -35,7 +35,7 @@ async function delay(ms) {
 
 
 //This function updates the 'clanwar' table in the MmySQL DataBase
-async function update(result) {
+async function updateClanWarStatus(result) {
     
     pool.getConnection((err, conn) => {
         if (err) throw err;
@@ -193,7 +193,7 @@ bot.on("ready" ,function() {
 
         }
 
-        await update(result)
+        await updateClanWarStatus(result)
 
         run()
     }
