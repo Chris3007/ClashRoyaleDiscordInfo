@@ -74,11 +74,11 @@ bot.on('message', function(message) {
     switch(args[0].toLowerCase()) {        
 
         case "help":
-            message.channel.send(`prefix: ${prefix}\nRegistreer: gebruik je playertag om je te registreren\n\`${prefix}registreer [playertag]\`\n\n Kisten: bekijk je kist cycle of die van iemand anders\n\`${prefix}kisten [playertag]\`\n\nProfiel: bekijk statistieken van jezelf of iemand anders\n\`${prefix}profiel [playertag]\`\n\n Clan: bekijk info over de clan\n\`\`\`${prefix}clan war\n${prefix}clan top\`\`\`\n**[BETA]**  Clan war vorige: bekijk de resultaten van de vorige clan wars  \n\`${prefix}clan war vorige [nummer (0-5)]\`\n\n**Als je al geregistreerd bent hoef je niet telkens je playertag achter je command te zetten**`) 
+            message.channel.send(`prefix: ${prefix}\nRegister: Use your playertag to register\n\`${prefix}register [playertag]\`\n\n Chests: Check your (or someone else's) chest cycle\n\`${prefix}chest [playertag]\`\n\nProfile: Check your (or someone else's) statistics\n\`${prefix}profile [playertag]\`\n\n Clan: Check info about your clan\n\`\`\`${prefix}clan war\n${prefix}clan top\`\`\`\n**[BETA]**  Clan war previous: view the results of the previous clan wars\n\`${prefix}clan war (previous/p) [number (0-5)]\`\n\n**If you're already registered you won't have to place your playertag after all the commands.**`) 
         break; 
 
 
-        case "registreer":
+        case "register":
             if(args[1]) {
                 if (args[1].charAt(0) == "#") {
                     args[1] = args[1].substr(1)
@@ -93,7 +93,7 @@ bot.on('message', function(message) {
                 xmlHttp.send();
                 var result = JSON.parse(xmlHttp.responseText);
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    message.channel.send("Je data wordt opgeslagen...").then((msg)=>{
+                    message.channel.send("Your data is being saved...").then((msg)=>{
                         const connection = mysql.createConnection({
                             host: login.host,
                             user: login.user,
@@ -101,38 +101,36 @@ bot.on('message', function(message) {
                             database: login.database
                         });
                         connection.connect((err) => {
-                            if (err) {msg.edit(`Sorry, er ging iets mis!`);}
+                            if (err) {msg.edit(`Sorry, someting went wrong!`);}
                         });
 
                         connection.query(`SELECT * FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
                             if(err) throw err;
 
                             if(rows.length >= 1) {
-                                msg.edit(`Je bent al geregistreed`);
+                                msg.edit(`You're already registerd.`);
                             }else {
                                 connection.query(`INSERT INTO dcMembers(userid, tag, name) VALUES ("${messageId}","${args[1]}", "${result.name}")`, (err, rows) => {
                                     if (err) throw err;
-                                    msg.edit("Je bent geregistreerd")
+                                    msg.edit("You're now registerd.")
                                 })
                             }
                         });
                     })
 
                 }else{
-                    message.channel.send("De playertag die je opgaf is niet gevonden")
+                    message.channel.send("The playertag you used was not found.")
                 }
             }else{
-                message.channel.send("Je moet een playertag geven. Deze kan je vinden in je Clash Royale profiel.")
+                message.channel.send("You have to use a playertag. These are located in your in-game Clash Royale profile.")
             }
         break;
 
 
-
-
-        case "kisten":
+        case "chest":
             //command kist
             if (!args[1]) {
-                message.channel.send("Je data wordt opgehaald...").then((msg)=>{
+                message.channel.send("Your data is being collected").then((msg)=>{
                     const connection = mysql.createConnection({
                         host: login.host,
                         user: login.user,
@@ -140,14 +138,14 @@ bot.on('message', function(message) {
                         database: login.database
                         });
                     connection.connect((err) => {
-                        if (err) {msg.edit(`Sorry, er ging iets mis!`);}
+                        if (err) {msg.edit(`Sorry, something went wrong!`);}
                     });
 
                     connection.query(`SELECT tag FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
                         if(err) throw err;
 
                         if(rows.length == 0) {
-                            msg.edit(`Je bent nog niet geregistreerd! Dit kan je doen met het command "${prefix}registreer`);
+                            msg.edit(`You're not registerd yet! You can do this using the '${prefix}register' command.`);
                         }else if (rows.length == 1) {
                             rows.forEach(row => {
                                 /* GET kisten & laat ze zien met emotes */
@@ -162,13 +160,20 @@ bot.on('message', function(message) {
                                     var chestMessage = "";
                                     var embed = new Discord.RichEmbed()
                                     .setColor("#0000FF")
-                                    .setTitle("Kisten Cycle")
+                                    .setTitle("Chests Cycle")
                                     items.forEach(chest => {
+                                        if(chest.name !== "Epic Chest") {
+                                            chest.name = "a " + chest.name
+                                        }else {
+                                            chest.name = "an " + chest.name
+                                        }
+            
+
                                         if (chest.index == 0) {
-                                            chestMessage = chestMessage + "Nog " + parseInt(chest.index + 1) + " win voor een " + chest.name + ".\n"
+                                            chestMessage = chestMessage + parseInt(chest.index + 1) + " win remaining for " + chest.name + ".\n"
                                             
                                         }else {
-                                            chestMessage = chestMessage + "Nog " + parseInt(chest.index + 1) + " wins voor een " + chest.name + ".\n"   
+                                            chestMessage = chestMessage + parseInt(chest.index + 1) + " wins remaining for " + chest.name + ".\n"   
                                         }
                                     });
                                     embed.setDescription(chestMessage)
@@ -201,13 +206,19 @@ bot.on('message', function(message) {
                         var chestMessage = "";
                         var embed = new Discord.RichEmbed()
                         .setColor("#0000FF")
-                        .setTitle("Kisten Cycle")
+                        .setTitle("Chests Cycle")
                         items.forEach(chest => {
+                            if(chest.name !== "Epic Chest") {
+                                chest.name = "a " + chest.name
+                            }else {
+                                chest.name = "an " + chest.name
+                            }
+
                             if (chest.index == 0) {
-                                chestMessage = chestMessage + "Nog " + parseInt(chest.index + 1) + " win voor een " + chest.name + ".\n"
+                                chestMessage = chestMessage + parseInt(chest.index + 1) + " win remaining for " + chest.name + ".\n"
                                 
                             }else {
-                                chestMessage = chestMessage + "Nog " + parseInt(chest.index + 1) + " wins voor een " + chest.name + ".\n"   
+                                chestMessage = chestMessage + parseInt(chest.index + 1) + " wins remaining for " + chest.name + ".\n"   
                             }
                         });
                         embed.setDescription(chestMessage)
@@ -219,118 +230,122 @@ bot.on('message', function(message) {
         break;
 
         
-        case "profiel":
-            //command profiel
-                if (!args[1]) {
-                    message.channel.send("Je data wordt opgehaald...").then((msg)=>{
-                    const connection = mysql.createConnection({
-                            host: login.host,
-                            user: login.user,
-                            password: login.password,
-                            database: login.database
-                            });
-                        connection.connect((err) => {
-                            if (err) {msg.edit(`Sorry, er ging iets mis!`);}
+        case "profile":
+            // If there is no tag specified the bot will collect the information from the user that issued the command
+            if (!args[1]) {
+                message.channel.send("Your data is being collected...").then((msg)=>{
+                const connection = mysql.createConnection({
+                        host: login.host,
+                        user: login.user,
+                        password: login.password,
+                        database: login.database
                         });
+                    connection.connect((err) => {
+                        if (err) {msg.edit(`Sorry, something went wrong!`);console.log("[" + new Date().toLocaleString() + "] Could not connect to database")}
+                    });
+        
+                    connection.query(`SELECT tag FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
+                        if(err) throw err;
+        
+                        if(rows.length == 0) {
+                            msg.edit(`You're not registerd yet! You can do this using the '${prefix}register' command.`);
+                        }else if (rows.length == 1) {
+                            rows.forEach(row => {
+                                var xmlHttp = new XMLHttpRequest();
+                                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/players/%23${row.tag}/`, false ); // false for synchronous request
+                                xmlHttp.setRequestHeader("Content-type", "application/json");
+                                xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                                xmlHttp.send();
+                                var result = JSON.parse(xmlHttp.responseText)
+                                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                                        var embedProfiel = new Discord.RichEmbed()
+                                        .setColor("#FF0000")
+                                        .setTitle("The profile of " + result.name)
             
-                        connection.query(`SELECT tag FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
-                            if(err) throw err;
-            
-                            if(rows.length == 0) {
-                                msg.edit(`Je bent nog niet geregistreerd! Dit kan je doen met het command "${prefix}registreer`);
-                            }else if (rows.length == 1) {
-                                rows.forEach(row => {
-                                    var xmlHttp = new XMLHttpRequest();
-                                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/players/%23${row.tag}/`, false ); // false for synchronous request
-                                    xmlHttp.setRequestHeader("Content-type", "application/json");
-                                    xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                                    xmlHttp.send();
-                                    var result = JSON.parse(xmlHttp.responseText)
-                                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-
-                                            var embedProfiel = new Discord.RichEmbed()
-                                            .setColor("#FF0000")
-                                            .setTitle("Profiel van " + result.name)
+                                        //Start datum
+                                        if(result.badges[1].progress) {
+                                            var startDate = new Date();
+                                            var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+                                            startDate.setDate(startDate.getDate() - result.badges[1].progress)
+                                                    
+                                            startDate = startDate.toLocaleDateString('en-GB', options);
                                             
-                                            //Start datum
-                                            if(result.badges[1].progress) {
-                                                var startDate = new Date();
-                                                var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
-                                                startDate.setDate(startDate.getDate() - result.badges[1].progress)
-                                                
-                                                startDate = startDate.toLocaleDateString('nl-NL', options);
-
-                                                embedProfiel.addField("Algemeen", `EXP level: ${result.expLevel}\nSpeelt sinds: ${startDate}\nTotaal aantal gevechten: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-kroon wins: ${result.threeCrownWins}`)
-                                            }else{
-                                                embedProfiel.addField("Algemeen", `EXP level: ${result.expLevel} \nTotaal aantal gevechten: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-kroon wins: ${result.threeCrownWins}`)                                                
-                                            }
-
-                                            if (result.leagueStatistics.bestSeason == undefined) {
-                                                embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNu: ${result.trophies}<:trophy_working:590862428544303114>\nBeste seizoen: ${result.bestTrophies} <:trophy_working:590862428544303114>`)
-                                            }else {
-                                                embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNu: ${result.trophies}<:trophy_working:590862428544303114>\nBeste seizoen (${result.leagueStatistics.bestSeason.id}): ${result.leagueStatistics.bestSeason.trophies}<:trophy_working:590862428544303114>\n Vorige seizoen (${result.leagueStatistics.previousSeason.id}): ${result.leagueStatistics.previousSeason.trophies}<:trophy_working:590862428544303114>`)
-                                            }
-                                            embedProfiel.addField("<:clan:589769271958175760>Clan" , `Rol: ${result.role.charAt(0).toUpperCase() + result.role.substring(1)}\nDonaties: ${result.donations}\nDonaties onstvangen: ${result.donationsReceived}\nTotale donaties: ${result.totalDonations}\nWarday wins: ${result.warDayWins}`)
-                                            msg.edit(embedProfiel)
-
-                                        }else {
-                                            message.channel.send("Er ging iets mis")
+                                            embedProfiel.addField("General", `EXP level: ${result.expLevel}\nStarted playing: ${startDate}\nTotal battles: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-crown wins: ${result.threeCrownWins}`)
+                                        }else{
+                                            embedProfiel.addField("General", `EXP level: ${result.expLevel} \nTotal battles: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-crown wins: ${result.threeCrownWins}`)                                                
                                         }
-            
-                                })
-                            }else {
-            
-                            }
-                        });
-                        connection.end()
-                    })
-                }else {
-                    message.channel.send("Je data wordt opgehaald...").then((msg)=>{
-                        if (args[1].charAt(0) == "#") {
-                            args[1] = args[1].substr(1)
-                        }
-            
-                        var xmlHttp = new XMLHttpRequest();
-                        xmlHttp.open( "GET", `https://api.clashroyale.com/v1/players/%23${args[1]}/`, false ); // false for synchronous request
-                        xmlHttp.setRequestHeader("Content-type", "application/json");
-                        xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
-                        xmlHttp.send();
-                        var result = JSON.parse(xmlHttp.responseText)
-                            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                                var embedProfiel = new Discord.RichEmbed()
-                                .setColor("#FF0000")
-                                .setTitle("Profiel van " + result.name)
+                                        //If the requested user is not in a league it will not show anything from leagueStatistics 
+                                        if (result.leagueStatistics == undefined) {
+                                            embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNu: ${result.trophies}<:trophy_working:590862428544303114>\nBest season: ${result.bestSeason.trophies} <:trophy_working:590862428544303114>`)
+                                        }else {
+                                            embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNow: ${result.trophies}<:trophy_working:590862428544303114>\nBest season (${result.leagueStatistics.bestSeason.id}): ${result.leagueStatistics.bestSeason.trophies}<:trophy_working:590862428544303114>\n Previous season (${result.leagueStatistics.previousSeason.id}): ${result.leagueStatistics.previousSeason.trophies}<:trophy_working:590862428544303114>`)
+                                        }
+                                        embedProfiel.addField("<:clan:589769271958175760>Clan" , `Rol: ${result.role.charAt(0).toUpperCase() + result.role.substring(1)}\nDonations: ${result.donations}\nDonations onstvangen: ${result.donationsReceived}\nTotal donations: ${result.totalDonations}\nWarday wins: ${result.warDayWins}`)
+                                        msg.edit(embedProfiel)
 
-                                //Start datum
-                                if(result.badges[1].progress) {
-                                    var startDate = new Date();
-                                    var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
-                                    startDate.setDate(startDate.getDate() - result.badges[1].progress)
-                                            
-                                        startDate = startDate.toLocaleDateString('nl-NL', options);
-                                    embedProfiel.addField("Algemeen", `EXP level: ${result.expLevel}\nSpeelt sinds: ${startDate}\nTotaal aantal gevechten: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-kroon wins: ${result.threeCrownWins}`)
-                                }else{
-                                    embedProfiel.addField("Algemeen", `EXP level: ${result.expLevel} \nTotaal aantal gevechten: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-kroon wins: ${result.threeCrownWins}`)                                                
-                                }
-                                if (result.leagueStatistics == undefined) {
-                                    embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNu: ${result.trophies}<:trophy_working:590862428544303114>\nBeste seizoen: ${result.bestSeason.trophies} <:trophy_working:590862428544303114>`)
-                                }else {
-                                    embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNu: ${result.trophies}<:trophy_working:590862428544303114>\nBeste seizoen (${result.leagueStatistics.bestSeason.id}): ${result.leagueStatistics.bestSeason.trophies}<:trophy_working:590862428544303114>\n Vorige seizoen (${result.leagueStatistics.previousSeason.id}): ${result.leagueStatistics.previousSeason.trophies}<:trophy_working:590862428544303114>`)
-                                }
-                                embedProfiel.addField("<:clan:589769271958175760>Clan" , `Rol: ${result.role.charAt(0).toUpperCase() + result.role.substring(1)}\nDonaties: ${result.donations}\nDonaties onstvangen: ${result.donationsReceived}\nTotale donaties: ${result.totalDonations}\nWarday wins: ${result.warDayWins}`)
-                                msg.edit(embedProfiel)
-                            }else {
-                                message.channel.send("Er ging iets mis")
+                                    }else {
+                                        message.channel.send("Something went wrong!")
+                                    }
+        
+                            })
+                        }else {
+        
+                        }
+                    });
+                    connection.end()
+                })
+            }else {
+                message.channel.send("The data is being collected...").then((msg)=>{
+                    if (args[1].charAt(0) == "#") {
+                        args[1] = args[1].substr(1)
+                    }
+        
+                    var xmlHttp = new XMLHttpRequest();
+                    xmlHttp.open( "GET", `https://api.clashroyale.com/v1/players/%23${args[1]}/`, false ); // false for synchronous request
+                    xmlHttp.setRequestHeader("Content-type", "application/json");
+                    xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                    xmlHttp.send();
+                    var result = JSON.parse(xmlHttp.responseText)
+                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                            var embedProfiel = new Discord.RichEmbed()
+                            .setColor("#FF0000")
+                            .setTitle("The profile of " + result.name)
+
+                            //Start datum
+                            if(result.badges[1].progress) {
+                                var startDate = new Date();
+                                var options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+                                startDate.setDate(startDate.getDate() - result.badges[1].progress)
+                                        
+                                startDate = startDate.toLocaleDateString('en-GB', options);
+                                
+                                embedProfiel.addField("General", `EXP level: ${result.expLevel}\nStarted playing: ${startDate}\nTotal battles: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-crown wins: ${result.threeCrownWins}`)
+                            }else{
+                                embedProfiel.addField("General", `EXP level: ${result.expLevel} \nTotal battles: ${result.battleCount}\nWins/losses: ${result.wins} | ${result.losses}\n3-crown wins: ${result.threeCrownWins}`)                                                
                             }
-                    })
-                }
+                            //If the requested user is not in a league it will not show anything from leagueStatistics 
+                            if (result.leagueStatistics == undefined) {
+                                embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNu: ${result.trophies}<:trophy_working:590862428544303114>\nBest season: ${result.bestSeason.trophies} <:trophy_working:590862428544303114>`)
+                            }else {
+                                embedProfiel.addField("Trophies", `Arena: ${result.arena.name}\nNow: ${result.trophies}<:trophy_working:590862428544303114>\nBest season (${result.leagueStatistics.bestSeason.id}): ${result.leagueStatistics.bestSeason.trophies}<:trophy_working:590862428544303114>\n Previous season (${result.leagueStatistics.previousSeason.id}): ${result.leagueStatistics.previousSeason.trophies}<:trophy_working:590862428544303114>`)
+                            }
+                            embedProfiel.addField("<:clan:589769271958175760>Clan" , `Rol: ${result.role.charAt(0).toUpperCase() + result.role.substring(1)}\nDonations: ${result.donations}\nDonations onstvangen: ${result.donationsReceived}\nTotal donations: ${result.totalDonations}\nWarday wins: ${result.warDayWins}`)
+                            msg.edit(embedProfiel)
+                        }else if(result.reason == 'notFound'){
+                            message.channel.send("This user could not be found. Please check the playertag. Playertags can only use the following letters and numbers:\n```0, 2, 8, 9.\nC, G, J, L, P, Q, R, U, V, Y```")
+                        }else {
+                            console.log(result.reason)
+                            message.channel.send("Something went wrong!")
+                        }
+                })
+            }
 
         break;
 
     /*\
     |*|     This command is currently disabled. It would have been a countdown to the next season, but I had to manually update it. N
-    |*|    case "seizoen":
-    |*|        //command seizoen
+    |*|    case "season":
+    |*|        //command season
     |*|        var countDownDate = new Date("Nov 4, 2019 9:00:00").getTime();
     |*|
     |*|
@@ -348,12 +363,12 @@ bot.on('message', function(message) {
     |*|            
     |*|        // Output the result in an element with id="demo"
     |*|        message.channel.send("Nog " + days + " dagen, " + hours + ":"
-    |*|        + minutes + ":" + seconds + " tot het nieuwe seizoen.");
+    |*|        + minutes + ":" + seconds + " tot het nieuwe season.");
     |*|            
     |*|        // If the count down is over, write some text 
     |*|        if (distance < 0) {
     |*|            clearInterval(x);
-    |*|            message.channel.send("Het nieuwe seizoen is begonnen!");
+    |*|            message.channel.send("Het nieuwe season is begonnen!");
     |*|        }
     |*|    break;
     \*/
@@ -508,7 +523,9 @@ bot.on('message', function(message) {
         break;
 
         default:
-            message.channel.send("This is not a valid command!")
+            msg = message.channel.send("This is not a valid command!").then(msg=> {
+                msg.delete(2500);
+            })
     }
 
 

@@ -4,7 +4,7 @@ This is a Discord bot that gets data from the official Clash Royale api.
 
 
 ## TODO
-- [ ] Finish all the translations
+- [x] Finish all the translations
 - [ ] Add a 'Season' command.
 - [ ] Move clantag to tokens.js
 
