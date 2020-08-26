@@ -22,15 +22,19 @@ var pool  = mysql.createPool({
     database: login.database
 });
 
+//Global vars. There is probaly a better way to do this, so please let me know
+var data = 0;
+var SQLresult = 0;
 
+//Re-used functions
 
+//This function is like a sleep function
 async function delay(ms) {
-    // return await for better async stack trace support in case of errors.
     return await new Promise(resolve => setTimeout(resolve, ms));
   } 
 
 
-var SQLresult = 0;
+//This function updates the 'clanwar' table in the MmySQL DataBase
 async function update(result) {
     
     pool.getConnection((err, conn) => {
@@ -49,17 +53,17 @@ async function update(result) {
 
 }
 
-//global
-var data = 0;
-
+//This function will connect the bot with discord and execute all the code inside
 bot.on("ready" ,function() {
+
     console.log("[" + new Date().toLocaleString() + "]");
     console.log(`Bot is active in ${bot.guilds.size} guilds, which have ${bot.users.size} users and ${bot.channels.size} channels.`); 
     console.log("The additional script is ready\n\n");
 
 
 
-    let run = async ()=>{
+    let run = async ()=>{        
+        //This causes this function to stop for 300000 milliseconds, which is 5 minutes
 
         await delay(300000)
 
@@ -86,7 +90,6 @@ bot.on("ready" ,function() {
             conn.release();
         });
         
-
         await delay(5000)
 
 
@@ -96,30 +99,24 @@ bot.on("ready" ,function() {
             
             
             if(result.state == "warDay" && data[0].status == "collectionDay") {
-                
 
                 console.log("[" + new Date().toLocaleString() + "] The warday just started")
                 var warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> Collection day is voorbij en Battle day gaat nu beginnen!\nDit is iedereen die meedoet:")
+                .setTitle("<:clan:589769271958175760> Collection day is over and Battle day is going to begin!\nThis is everyone who participates:")
                 .setColor("#0000FF")
                 var warMessage = "";
-                var part = result.participants;  
-                var count = 0;     
-                
-                
+                var part = result.participants;
+                var count = 0;
 
 
                 part.forEach(participant => {
-                        //warMessage = warMessage + (`**${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} battles, waarvan ${result.participants[count].wins} gewonnen\n`)
-                        
-                        if(result.participants[count].collectionDayBattlesPlayed < 3) {
-                            warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, **${result.participants[count].collectionDayBattlesPlayed} collection battles**\n`)
-                        }else {
-                            warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} kaarten, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
-                        }
-                        
-                        count++
-
+                    if(result.participants[count].collectionDayBattlesPlayed < 3) {
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, **${result.participants[count].collectionDayBattlesPlayed} collection battles**\n`)
+                    }else {
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].cardsEarned} cards, ${result.participants[count].collectionDayBattlesPlayed} collection battles\n`)
+                    }
+                    
+                    count++
                 });
                 
                 warEmbed.setDescription(warMessage, inline=true)
@@ -129,13 +126,13 @@ bot.on("ready" ,function() {
 
 
                 //Clan war just started
-                bot.channels.get(restrictedChannelClan).send("Er is weer een nieuwe clanwar begonnen!")
+                bot.channels.get(restrictedChannelClan).send("A new clan war just started!")
                 console.log("[" + new Date().toLocaleString() + "] Clan war just started")
 
             }else if(result.state == "notInWar" && data[0].status == "collectionDay") {
                 //Clan war cancelled
-                bot.channels.get(restrictedChannelClan).send("De clan war is geanuleerd")
-                console.log("[" + new Date().toLocaleString() + "] Clan war just stopped")
+                bot.channels.get(restrictedChannelClan).send("The clan war just got cancelled")
+                console.log("[" + new Date().toLocaleString() + "] Clan war just cancelled ")
             }else if(result.state == "notInWar" && data[0].status == "warDay"){
 
 
@@ -152,22 +149,23 @@ bot.on("ready" ,function() {
                 var result = result.items[0]
 
                 //This is for when clanwar ended
-                console.log("[" + new Date().toLocaleString() + "] De clan war is nu afgelopen")
+                console.log("[" + new Date().toLocaleString() + "] The clan war is finished")
                 var standing = "";
                 if(result.standings[0].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we eerste geworden!**";
+                    standing = "**This clanwar we finished first!**";
                 }else if(result.standings[1].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we tweede geworden!**";
+                    standing = "**This clanwar we finished second!**";
                 }else if(result.standings[2].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we derde geworden**";
+                    standing = "**This clanwar we finished third**";
                 }else if(result.standings[3].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we vierde geworden**";
+                    standing = "**This clanwar we finished fourth**";
                 }else if(result.standings[4].clan.tag == "#PURV2URR") {
-                    standing = "**Deze clanwar zijn we vijfde geworden**";
+                    standing = "**This clanwar we finished fifth**";
                 }
 
                 var warEmbed = new Discord.RichEmbed()
-                .setTitle("<:clan:589769271958175760> De clanwar is voorbij!\n"+standing+"\nDit was iedereen die meedeed:")
+                .setTitle("<:clan:589769271958175760> The clan war is over!\n"+standing+"\nThis was everyone who participated:")
+
                 .setColor("#0000FF");
                 var warMessage = "";
                 
@@ -176,12 +174,12 @@ bot.on("ready" ,function() {
                 part.forEach(participant => {
                     //als wins = 0, helaas verloren, anders hoera
                     if (result.participants[count].battlesPlayed == 0) {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, **laatste battle niet gespeeld!**\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, **did not play last battle!**\n`)
                     }
                     else if (result.participants[count].wins == 0) {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle verloren\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, lost last battle\n`)
                     }else {
-                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} kaarten, laatste battle gewonnen\n`)
+                        warMessage = warMessage + (`${count+1}. **${result.participants[count].name}** :\n ${result.participants[count].collectionDayBattlesPlayed} collection battles, ${result.participants[count].cardsEarned} cards, won last battle\n`)
                     }
                     count++
                 });
@@ -202,8 +200,12 @@ bot.on("ready" ,function() {
         run()
     }
 
+
+
     run();
 
+
+    
 })
 
 
