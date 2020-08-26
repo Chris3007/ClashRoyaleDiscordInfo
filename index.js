@@ -518,6 +518,7 @@ bot.on('message', function(message) {
                         message.edit("This is not a valid command!")
                         msg.delete(2500)
                     }
+
                 }
             })
         break;

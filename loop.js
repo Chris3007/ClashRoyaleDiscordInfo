@@ -10,7 +10,7 @@ const login = require("login");
 const tokens = require('tokens');
 const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
-const clanTag = tokens.clantoken
+const clanTag = tokens.clanToken
 const restrictedChannelClan = tokens.restrictedChannelClan
 
 
@@ -62,9 +62,9 @@ bot.on("ready" ,function() {
 
 
 
-    let run = async ()=>{
-        
+    let run = async ()=>{        
         //This causes this function to stop for 300000 milliseconds, which is 5 minutes
+
         await delay(300000)
 
         //For some reason it appears that including the clanTag in xmlHttp.open() does noet give the expected result. This way it will return the data you want. 
@@ -77,6 +77,7 @@ bot.on("ready" ,function() {
         await xmlHttp.responseText;
         var result =  JSON.parse(xmlHttp.responseText)
         console.log(result)
+
 
         pool.getConnection((err, conn) => {
             if (err) throw err;
@@ -164,6 +165,7 @@ bot.on("ready" ,function() {
 
                 var warEmbed = new Discord.RichEmbed()
                 .setTitle("<:clan:589769271958175760> The clan war is over!\n"+standing+"\nThis was everyone who participated:")
+
                 .setColor("#0000FF");
                 var warMessage = "";
                 
