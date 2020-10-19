@@ -131,8 +131,47 @@ bot.on('message', function(message) {
             }
         break;
 
+        case "update":
+            
+            const connection = mysql.createConnection({
+              host: login.host,
+              user: login.user,
+              password: login.password,
+              database: login.database
+            });
 
+            connection.connect((err) => {
+                if (err) {msg.edit(`Sorry, something went wrong!`);}
+            });
 
+            connection.query(`SELECT tag, clanTag, name FROM dcMembers where userid = "${messageId}"`, (err,rows) => {
+                if(err) throw err;
+
+              if(rows.length == 0) {
+                msg.edit(`You're not registerd. You can do this by ${prefix}register`);
+              }else {
+
+                //check tag
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "GET", `https://api.clashroyale.com/v1/players/%23${messageId}`, false ); // false for synchronous request
+                xmlHttp.setRequestHeader("Content-type", "application/json");
+                xmlHttp.setRequestHeader("authorization", "Bearer "+apiToken);
+                xmlHttp.send();
+                var result = JSON.parse(xmlHttp.responseText);
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+
+                  if (result.clan.tag.charAt(0) == "#") {
+                    result.clan.tag = result.clan.tag.substr(1)
+                  }
+
+                  connection.query(`UPDATE dcMembers set clanTag", "${result.clan.tag}", "${result.name}")`, (err, rows) => {
+                    if (err) throw err;
+                    msg.edit("Your details have been updated")
+                  })
+                }
+                }
+            })
+        break; 
 
         case "kisten":
             //command kist
