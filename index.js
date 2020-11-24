@@ -4,9 +4,9 @@ const bot = new Discord.Client();
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const mysql = require('mysql');
-const login = require("login"); 
+const login = require("./login.js"); 
 
-const tokens = require('tokens');
+const tokens = require('./tokens.js');
 const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
 const clanTag = tokens.clantoken;
