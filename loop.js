@@ -35,7 +35,9 @@ async function delay(ms) {
 
 
 //This function updates the 'clanwar' table in the MmySQL DataBase
-async function update(result) {
+
+async function updateClanWarStatus(result) {
+
     
     pool.getConnection((err, conn) => {
         if (err) throw err;
@@ -62,7 +64,9 @@ bot.on("ready" ,function() {
 
 
 
-    let run = async ()=>{        
+
+    let run = async ()=>{
+        
         //This causes this function to stop for 300000 milliseconds, which is 5 minutes
 
         await delay(300000)
@@ -78,6 +82,7 @@ bot.on("ready" ,function() {
         var result =  JSON.parse(xmlHttp.responseText)
         console.log(result)
 
+      
 
         pool.getConnection((err, conn) => {
             if (err) throw err;
@@ -165,7 +170,6 @@ bot.on("ready" ,function() {
 
                 var warEmbed = new Discord.RichEmbed()
                 .setTitle("<:clan:589769271958175760> The clan war is over!\n"+standing+"\nThis was everyone who participated:")
-
                 .setColor("#0000FF");
                 var warMessage = "";
                 
@@ -195,7 +199,7 @@ bot.on("ready" ,function() {
 
         }
 
-        await update(result)
+        await updateClanWarStatus(result)
 
         run()
     }
