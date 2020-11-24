@@ -4,7 +4,8 @@ const bot = new Discord.Client();
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const mysql = require('mysql');
-const login = require("login");
+
+const login = require("./login.js"); 
 let pool = mysql.createPool({
   connectionLimit: 100,
   host: login.host,
@@ -14,7 +15,7 @@ let pool = mysql.createPool({
 });
 
 
-const tokens = require('tokens');
+const tokens = require('./tokens.js');
 const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
 const clanTag = tokens.clantoken;
