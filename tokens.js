@@ -3,7 +3,7 @@ module.exports.apiToken = "Clash Royale dev token";
 
 
 //Put the your clantag without the # here
-module.exports.clantoken = "Clash royale clan #";
+module.exports.clanToken = "Clash royale clan #";
 
 //This is the prefix that the bot will respond to
 module.exports.prefix = "!!"

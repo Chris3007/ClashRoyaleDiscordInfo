@@ -10,7 +10,7 @@ const login = require("login");
 const tokens = require('tokens');
 const apiToken = tokens.apiToken;
 const discordToken = tokens.discordToken;
-const clanTag = tokens.clantoken
+const clanTag = tokens.clanToken
 const restrictedChannelClan = tokens.restrictedChannelClan
 
 
@@ -35,7 +35,9 @@ async function delay(ms) {
 
 
 //This function updates the 'clanwar' table in the MmySQL DataBase
+
 async function updateClanWarStatus(result) {
+
     
     pool.getConnection((err, conn) => {
         if (err) throw err;
@@ -62,9 +64,11 @@ bot.on("ready" ,function() {
 
 
 
+
     let run = async ()=>{
         
         //This causes this function to stop for 300000 milliseconds, which is 5 minutes
+
         await delay(300000)
 
         //For some reason it appears that including the clanTag in xmlHttp.open() does noet give the expected result. This way it will return the data you want. 
@@ -77,6 +81,8 @@ bot.on("ready" ,function() {
         await xmlHttp.responseText;
         var result =  JSON.parse(xmlHttp.responseText)
         console.log(result)
+
+      
 
         pool.getConnection((err, conn) => {
             if (err) throw err;
